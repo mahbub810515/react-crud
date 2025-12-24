@@ -1,6 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
+
 
 const App = () => {
+ 
+
   return (
     <div>
       <>
@@ -10,7 +13,7 @@ const App = () => {
       <div className="mb-4">
         <h1 className="font-bold rounded-4 py-3 bg-green-400 text-white text-2xl text-center">Todo List</h1>
         <div className="flex mt-4">
-          <input
+          <input 
             className="shadow appearance-none border rounded w-full py-2 px-3 mr-4 r"
             placeholder="Add Todo"
           />
