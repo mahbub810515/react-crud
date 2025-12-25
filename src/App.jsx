@@ -1,21 +1,37 @@
-import React, { useState } from 'react'
-import { getDatabase,ref,set } from "firebase/database";
+import React, { useEffect, useState } from 'react'
+import { getDatabase, ref, set,push, onValue } from "firebase/database";
 
 
 const App = () => {
 
   let [task, setTask] = useState('')
+  let [tasklist, setTasklist] = useState([]);
 
   const db = getDatabase();
   // get user input from ui
   const handleInputTask = (e) => {
     setTask(e.target.value)
   }
-  const handleSubmitTask = () => {    
-    set(ref(db, 'todolist/'), {
-      item: task,      
-    });
+  const handleSubmitTask = () => {
+    set(push(ref(db, 'todolist/')), {
+      item: task,
+    }).then(() => {
+
+    }).catch((err) => {
+      console.log(err)
+    })
   }
+  useEffect(() => {
+    const starCountRef = ref(db, 'todolist/',);
+    onValue(starCountRef, (snapshot) => {
+      let array = [];
+      snapshot.forEach((item) => {
+        array.push({ ...item.val(), id: item.key });
+      })
+      setTasklist(array)
+    });
+  }, []);
+  
 
   return (
     <div>
@@ -36,14 +52,17 @@ const App = () => {
               </div>
             </div>
             <div>
-              <div className="flex mb-4 items-center">
-                <p className="w-full text-white bg-green-400 p-2.5 rounded">
-                  Todo task add here
-                </p>
-                <button className="flex-no-shrink p-2 ml-2 border rounded text-red border-red hover:text-white hover:bg-red-500">
-                  Remove
-                </button>
-              </div>
+              {tasklist.map((Litem) => (
+                <div className="flex mb-4 items-center">
+                  <p className="w-full text-white bg-green-400 p-2.5 rounded">
+                    {Litem.item}
+                  </p>
+                  <button className="flex-no-shrink p-2 ml-2 border rounded text-red border-red hover:text-white hover:bg-red-500">
+                    Remove
+                  </button>
+                </div>
+              ))}
+
             </div>
           </div>
         </div>
