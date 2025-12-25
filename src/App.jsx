@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { getDatabase, ref, set,push, onValue } from "firebase/database";
+import { getDatabase, ref, set,push, onValue, remove } from "firebase/database";
 
 
 const App = () => {
@@ -16,7 +16,7 @@ const App = () => {
     set(push(ref(db, 'todolist/')), {
       item: task,
     }).then(() => {
-
+        setTask('');
     }).catch((err) => {
       console.log(err)
     })
@@ -31,7 +31,9 @@ const App = () => {
       setTasklist(array)
     });
   }, []);
-  
+  const handleDelete=(id)=>{
+      remove(ref(db, 'todolist/'+id,))
+  }  
 
   return (
     <div>
@@ -57,7 +59,7 @@ const App = () => {
                   <p className="w-full text-white bg-green-400 p-2.5 rounded">
                     {Litem.item}
                   </p>
-                  <button className="flex-no-shrink p-2 ml-2 border rounded text-red border-red hover:text-white hover:bg-red-500">
+                  <button onClick={()=>handleDelete(Litem.id)} className="flex-no-shrink p-2 ml-2 border rounded text-red border-red hover:text-white hover:bg-red-500">
                     Remove
                   </button>
                 </div>
