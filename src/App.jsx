@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { getDatabase, ref, set,push, onValue, remove } from "firebase/database";
+import { getDatabase, ref, set,push, onValue, remove, update } from "firebase/database";
 
 
 const App = () => {
@@ -7,7 +7,10 @@ const App = () => {
   let [task, setTask] = useState('')
   let [tasklist, setTasklist] = useState([]);
   let [editModal, setEditModal] = useState(false);
-
+  let [editTask, setEditTask] = useState('');
+  let [id, setId] = useState(null);
+  let [editData, setEditData] = useState('');
+  
   const db = getDatabase();
   // get user input from ui
   const handleInputTask = (e) => {
@@ -35,10 +38,21 @@ const App = () => {
   const handleDelete=(id)=>{
       remove(ref(db, 'todolist/'+id,))
   }  
-  const handleEditModal=(id)=>{
+  const handleEditModal=(id,data)=>{
+      setId(id)
+      setEditData(data)
       setEditModal(!editModal)
   }
-
+  const handleUpdatTask=()=>{
+    update(ref(db, 'todolist/'+id), {
+      item: editTask,
+    }).then(()=>{
+      setEditModal(false)
+    }).catch((err)=>{
+      console.log(err);
+    })
+  }
+  
   return (
     <div>
       <>
@@ -66,7 +80,7 @@ const App = () => {
                   <button onClick={()=>handleDelete(Litem.id)} className="flex-no-shrink p-2 ml-2 border rounded text-red border-red hover:text-white hover:bg-red-500">
                     Remove
                   </button>
-                  <button onClick={()=>handleEditModal(Litem.id)} className="flex-no-shrink p-2 ml-2 border rounded text-red border-red hover:text-white hover:bg-red-500">
+                  <button onClick={()=>handleEditModal(Litem.id,Litem.item)} className="flex-no-shrink p-2 ml-2 border rounded text-red border-red hover:text-white hover:bg-red-500">
                     Edite
                   </button>
                 </div>
@@ -79,8 +93,8 @@ const App = () => {
         <div className='w-full h-screen  bg-gray-500/85 flex items-center justify-center absolute top-0 left-0'>
           <div className='w-100 h-20 rounded bg-white relative flex items-center justify-center'>
             <button onClick={()=> setEditModal(false)} className='bg-red-500 px-1 absolute top-0 right-0'>X</button>
-            <input className='border rounded p-2' type="text" placeholder='update your task'/>
-            <button className='p-2.5 ml-3 border rounded hover:bg-green-500 hover:text-white'>Update</button>
+            <input onChange={(e)=>setEditTask(e.target.value)} className='border rounded p-2' type="text" placeholder={editData}/>
+            <button onClick={handleUpdatTask} className='p-2.5 ml-3 border rounded hover:bg-green-500 hover:text-white'>Update</button>
           </div>
         </div>
         }
